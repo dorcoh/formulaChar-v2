@@ -1,1 +1,1 @@
-from .core import hmm
+from .runner import Runner
