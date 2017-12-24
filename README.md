@@ -1,4 +1,6 @@
-Formula characterizer, automates the following:
+## Formula characterizer v2
+
+Under development, automates the following:
 
 ### Phase 1 - conduct experiments
 - Run binaries of SAT solvers with input formulas
