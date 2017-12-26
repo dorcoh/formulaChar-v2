@@ -25,8 +25,6 @@ class RunnerTestSuite(unittest.TestCase):
 		correct_cmd = 'minisat tests/check.cnf -var-decay=0.9'
 		self.assertEqual(cmd, correct_cmd)
 
-	# FAILS
-	# still exit status 10 somehow..
 	def test_run_with_correct_stdout_file(self):
 		stdout_file = open('tests/check.cnf.out')
 		correct_out = stdout_file.read()
