@@ -8,8 +8,7 @@ setup_logging()
 log = logging.getLogger(__name__)
 
 class Runner():
-	"""
-	A class for running executables with arguments,
+	""" A class for running executables with arguments,
 	usually input files, and save their output to file
 	"""
 
@@ -17,16 +16,15 @@ class Runner():
 		log.info('Initialized new Runner instance %s', self)
 
 	def produce_command(self, bin, input_fname, params, prefix=False):
-		""" 
-		Produce command to run on a unix shell
+		""" Produce command to run on a unix shell
 		In: 
-			bin - executable (including path),
-			input_fname - input file name,
-			params - parameters string,
-			prefix - adds './' prefix to command (unix style)
-					 only needed when binary in same dir as script
+			bin:		executable (including path),
+			input_fname:input file name,
+			params:		parameters string,
+			prefix:		adds './' prefix to command (unix style)
+		
 		Out: 
-			command to run
+						command (string)
 		"""
 		run_prefix = ''
 		if prefix:
@@ -37,19 +35,18 @@ class Runner():
 		log.info("Produced command: '%s'", cmd_string)
 		return cmd_string
 
-	def run(self, cmd, timeout, parsed=False):
-		"""
-		Run command with subprocess Popen
+	def run(self, cmd, timeout, parsed=False, exit_codes=(0,10,20)):
+		""" Run command with subprocess.Popen
 		In:
-			cmd - output of produce_command function
-			timeout - timeout in seconds
-			parsed - indicates if to parse command,
-					 e.g., 'a -bla' isn't parsed -
-					 which parsed as ['a', '-bla']
+			cmd:		output of produce_command function
+			timeout:	timeout in seconds
+			parsed:		indicates if to parse command,
+					 	e.g., 'ls -l' isn't parsed -
+					 	which parsed as ['ls', '-l']
+			exit_codes: tuple, skip selected process codes
+					 	otherwise raise an exception
 		Out:
-			output (stdout) in utf-8
-			'timeout' on timeout
-			None on error
+						{process stdout (utf-8), 'timeout', None on error}
 		"""
 		if not parsed:
 			cmd = shlex.split(cmd)
@@ -61,9 +58,9 @@ class Runner():
 
 			out, err = proc.communicate(timeout=timeout)
 
-			# check return code
-			# (some programs don't follow the standard returncode=0 on success)
-			log.info("Process terminated with return value %s", proc.returncode)
+			# check exit code
+			if proc.returncode not in exit_codes:
+				raise subprocess.CalledProcessError(proc.returncode, cmd)
 
 			log.info("Succeeded running: %s", cmd)
 			return out
@@ -74,14 +71,9 @@ class Runner():
 			return 'timeout'
 
 		except subprocess.CalledProcessError as e:
-			log.warn("Terminated with return value: %s", e.returncode, exc_info=True)
+			log.warn("Process error, return value: %s, stderr: %s", e.returncode, err, exc_info=True)
 			return None
 
 		except OSError as e:
-			log.warn("Cannot run commmand: '%s'", cmd, exc_info=True)
-			return None
-
-		# catch other exceptions
-		except:
-			log.warn("Cannot run commmand: '%s'", cmd)
+			log.warn("OS Error, cannot run commmand: '%s'", cmd, exc_info=True)
 			return None
