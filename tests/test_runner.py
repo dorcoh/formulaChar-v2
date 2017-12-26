@@ -7,6 +7,7 @@ import subprocess
 
 class RunnerTestSuite(unittest.TestCase):
 	"""Runner test cases."""
+	
 	def sample_command(self):
 		bin = 'minisat'
 		input_fname = 'tests/check.cnf'
@@ -18,7 +19,6 @@ class RunnerTestSuite(unittest.TestCase):
 	def setUp(self):
 		# create instance
 		self.instance = Runner()
-	
 
 	def test_produce_command(self):
 		cmd = self.sample_command()

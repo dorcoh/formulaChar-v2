@@ -4,28 +4,29 @@ import logging
 from .log_utils import setup_logging
 import os
 
-setup_logging(default_level=logging.DEBUG)
+setup_logging()
 log = logging.getLogger(__name__)
 
 class Runner():
 	"""
-	A class for running binaries with arguments,
-	and save their stdout to file
+	A class for running executables with arguments,
+	usually input files, and save their output to file
 	"""
+
 	def __init__(self):
 		log.info('Initialized new Runner instance %s', self)
 
 	def produce_command(self, bin, input_fname, params, prefix=False):
-		"""
-			Produce command to run on a unix shell
-			In: 
-				bin - executable (including path),
-				input_fname - input file name,
-				params - parameters string,
-				prefix - adds ./ to command (unix style)
-						 needed only when bin in same dir as script
-			Out: 
-				command to run
+		""" 
+		Produce command to run on a unix shell
+		In: 
+			bin - executable (including path),
+			input_fname - input file name,
+			params - parameters string,
+			prefix - adds './' prefix to command (unix style)
+					 only needed when binary in same dir as script
+		Out: 
+			command to run
 		"""
 		run_prefix = ''
 		if prefix:
@@ -33,20 +34,22 @@ class Runner():
 		cmd_string = "{run_prefix}{bin} {input_fname} {params}" \
 		.format(run_prefix=run_prefix, bin=bin, input_fname=input_fname,
 				params=params)
-		log.debug("Produced command: '%s'", cmd_string)
+		log.info("Produced command: '%s'", cmd_string)
 		return cmd_string
 
 	def run(self, cmd, timeout, parsed=False):
 		"""
-			Run command with subprocess Popen
-
-			In:
-				cmd - output of produce_command function
-			Out:
-				output (stdout) in utf-8
-				'timeout' on timeout
-				None on error
-
+		Run command with subprocess Popen
+		In:
+			cmd - output of produce_command function
+			timeout - timeout in seconds
+			parsed - indicates if to parse command,
+					 e.g., 'a -bla' isn't parsed -
+					 which parsed as ['a', '-bla']
+		Out:
+			output (stdout) in utf-8
+			'timeout' on timeout
+			None on error
 		"""
 		if not parsed:
 			cmd = shlex.split(cmd)
