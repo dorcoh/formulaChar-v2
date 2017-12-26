@@ -2,14 +2,14 @@ import subprocess,shlex
 import time
 import logging
 from .log_utils import setup_logging
-import os
 
 setup_logging()
 log = logging.getLogger(__name__)
 
 class Runner():
 	""" A class for running executables with arguments,
-	usually input files, and save their output to file
+	save their output to file, then pass its instance
+	to a collector.
 	"""
 
 	def __init__(self):
